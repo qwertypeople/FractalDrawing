@@ -109,37 +109,47 @@ void FractalCreator::drawFractal() {
 	uint8_t red = 0;
 	uint8_t green = 0;
 	uint8_t blue = 0;
+	int iterations = 0;
+	int range = 0;
+	int rangeTotal = 0;
+	int rangeStart = 0;
+	int totalPixels = 0;
 
-	RGB startColor(0, 0, 0);
-	RGB endColor(0, 0, 255);
-	RGB colorDiff = endColor - startColor;
 
 	for (int y = 0; y < m_height; y++) {
 		for (int x = 0; x < m_width; x++) {
 
+			iterations = m_fractal[(y * m_width) + x];
+			range = getRange(iterations);
+			rangeTotal = m_rangeTotals[range];
+			rangeStart = m_ranges[range];
+
+			RGB& startColor = m_colors[range];
+			RGB& endColor   = m_colors[range+1];
+			RGB colorDiff = endColor - startColor;
+
 			red = 0;
 			green = 0;
-			blue = 0;
-
-			int iterations = m_fractal[(y * m_width) + x];
+			blue = 0;			
 
 			uint8_t color = (uint8_t)(256 * (double)iterations / Mandelbrot::MAX_ITERATIONS);
 
 			if (iterations != Mandelbrot::MAX_ITERATIONS) {
-				double hue = 0.0;
-				for (int i = 0; i <= iterations; i++) {
-					hue += (double)m_histogram[i] / m_total;
-				}
 
-				red = startColor.m_r + colorDiff.m_r * hue;
-				green = startColor.m_g + colorDiff.m_g * hue;
-				blue = startColor.m_b + colorDiff.m_b * hue;
+				totalPixels = 0;
+				
+				for (int i = 0; i <= iterations; i++) {
+					totalPixels += m_histogram[i];
+
+				}
+				red =   startColor.m_r + colorDiff.m_r * (double)totalPixels / rangeTotal;
+				green = startColor.m_g + colorDiff.m_g * (double)totalPixels / rangeTotal;
+				blue =  startColor.m_b + colorDiff.m_b * (double)totalPixels / rangeTotal;
 				
 			}
 			m_bitmap.setPixel(x, y, red, green, blue);
 		}
 	}
-
 }
 
 void FractalCreator::writeBitmape(string name) {
