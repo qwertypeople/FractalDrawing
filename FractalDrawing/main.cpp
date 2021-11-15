@@ -24,18 +24,24 @@ int main() {
 	double min = 999999;
 	double max = -999999;
 
+	ZoomList zoomList(WIDTH, HEIGHT);
+
+	zoomList.add(Zoom(WIDTH/2, HEIGHT/2, (4./ WIDTH)));
+	zoomList.add(Zoom(295, HEIGHT -202, 0.1));
+	zoomList.add(Zoom(312, HEIGHT - 304, 0.1));
+
 	unique_ptr<int[]> histogram(new int[Mandelbrot::MAX_ITERATIONS + 1]{0});
 	unique_ptr<int[]> fractal(new int[WIDTH * HEIGHT]{ 0 });
 
 	
 
 	for (int y = 0; y < HEIGHT; y++) {
-		cout << "boucle 1." << y << endl;
+		//cout << "boucle 1." << y << endl;
 		for (int x = 0; x < WIDTH; x++) {
-			double xFractal = (x - WIDTH / 2 - (WIDTH / 4)) * (2.0 / HEIGHT);
-			double yFractal = (y - HEIGHT / 2) * (2.0 / HEIGHT);
 
-			int iterations = Mandelbrot::getIterations(xFractal, yFractal);
+			pair<double, double> coords = zoomList.doZoom(x, y);
+
+			int iterations = Mandelbrot::getIterations(coords.first, coords.second);
 			fractal[(y * WIDTH) + x] = iterations;
 
 			if (iterations != Mandelbrot::MAX_ITERATIONS) {
@@ -52,7 +58,7 @@ int main() {
 	}
 
 	for (int y = 0; y < HEIGHT; y++) {
-		cout << "boucle 2." << y << endl;
+		//cout << "boucle 2." << y << endl;
 		for (int x = 0; x < WIDTH; x++) {
 
 			uint8_t red = 0;
@@ -68,18 +74,9 @@ int main() {
 				for (int i = 0; i <= iterations; i++) {
 					hue += (double)histogram[i] / total;
 				}
-				if ((x * y) % 3 == 0) {
-					green = (uint8_t)pow(255, hue);
-				}
-				else if ((x * y) % 3 == 1) {
-					red = (uint8_t)pow(255, hue);
-				}
-				else if ((x * y) % 3 == 0) {
-					blue = (uint8_t)pow(255, hue);
-				}
 
+				green = (uint8_t)pow(255, hue);
 
-			
 			}
 			bitmap.setPixel(x, y, red, green, blue);
 		}			

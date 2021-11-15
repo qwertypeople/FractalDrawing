@@ -4,12 +4,15 @@ namespace caveofprogramming {
 
 	class Zoom
 	{
+	public:
+
 		int m_x{ 0 };
 		int m_y{ 0 };
-		double m_sacle{ 0 };
+		double m_scale{ 1 };
 
-		Zoom(int x, int y, int scale) : m_x(x), m_y(y), m_sacle(scale) {};
-
+		Zoom(int x, int y, double scale) :
+			 m_x(x)
+			,m_y(y)
+			, m_scale(scale) {};
 	};
-
 }
