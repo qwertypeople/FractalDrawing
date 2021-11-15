@@ -1,20 +1,55 @@
 #include "FractalCreator.h"
 
 
+#include <iostream>
+#include <assert.h>
+
 
 namespace caveofprogramming {
 
+
+void FractalCreator::addRange(double rangeEnd, const RGB& rgb) {
+
+	m_ranges.push_back(rangeEnd*Mandelbrot::MAX_ITERATIONS);
+	m_colors.push_back(rgb);
+
+	if (m_bGotFirstRange) {
+		m_rangeTotals.push_back(0);
+	}
+
+	m_bGotFirstRange = true;
+}
+
+int FractalCreator::getRange(int iterations) const {
+	int range = 0;
+
+	for (int i = 1; i < m_ranges.size(); i++) {
+		range = i;
+
+		if (m_ranges[1] > iterations) {
+			break;
+		}
+	}
+
+	range--;
+	
+	assert(range > -1);
+	assert(range < m_ranges.size());
+
+	return range;
+}
+
+void FractalCreator::addZoom(const Zoom& zoom) {
+	m_zoomList.add(zoom);
+}
+
 void FractalCreator::run(string name) {
-
-
-
-
 	calculateIteration();
 	calculateTotalIterations();
+	calculateRangeTotals();
 	drawFractal();
 	writeBitmape(name);
 }
-
 
 FractalCreator::FractalCreator(int width, int height): 
 	 m_width(width)
@@ -26,13 +61,13 @@ FractalCreator::FractalCreator(int width, int height):
 
 	m_zoomList.add(Zoom(width / 2, height / 2, (4. / m_width)));
 }
+
 FractalCreator::~FractalCreator() {
 
 }
 
 void FractalCreator::calculateIteration() {
 	for (int y = 0; y < m_height; y++) {
-		//cout << "boucle 1." << y << endl;
 		for (int x = 0; x < m_width; x++) {
 
 			pair<double, double> coords = m_zoomList.doZoom(x, y);
@@ -44,6 +79,21 @@ void FractalCreator::calculateIteration() {
 				m_histogram[iterations]++;
 			}
 		}
+	}
+}
+
+void FractalCreator::calculateRangeTotals() {
+
+	int rangeIndex = 0;
+
+	for (int i = 0; i < Mandelbrot::MAX_ITERATIONS; i++) {
+		int pixels = m_histogram[i];
+		
+		if (i >= m_ranges[rangeIndex + 1]) {
+			rangeIndex++;			
+		}
+
+		m_rangeTotals[rangeIndex] += pixels;
 	}
 }
 
@@ -60,8 +110,8 @@ void FractalCreator::drawFractal() {
 	uint8_t green = 0;
 	uint8_t blue = 0;
 
-	RGB startColor(0, 0, 20);
-	RGB endColor(255, 128, 74);
+	RGB startColor(0, 0, 0);
+	RGB endColor(0, 0, 255);
 	RGB colorDiff = endColor - startColor;
 
 	for (int y = 0; y < m_height; y++) {
@@ -91,14 +141,9 @@ void FractalCreator::drawFractal() {
 	}
 
 }
-void FractalCreator::addZoom(const Zoom& zoom) {
-	m_zoomList.add(zoom);
-}
+
 void FractalCreator::writeBitmape(string name) {
 	m_bitmap.write(name);
 }
-
-
-
 
 }
