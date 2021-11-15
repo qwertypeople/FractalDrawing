@@ -4,10 +4,12 @@
 #include <math.h>
 #include "Bitmap.h"
 #include "Mandelbrot.h"
+#include "ZoomList.h"
 
 
 
 using namespace std;
+
 using namespace caveofprogramming;
 
 int main() {
@@ -15,8 +17,8 @@ int main() {
 
 	int aa_Count = 0;
 	
-	int const WIDTH = 600;
-	int const HEIGHT = 400;
+	int const WIDTH = 800;
+	int const HEIGHT = 600;
 	Bitmap bitmap(WIDTH, HEIGHT);
 
 	double min = 999999;
@@ -28,6 +30,7 @@ int main() {
 	
 
 	for (int y = 0; y < HEIGHT; y++) {
+		cout << "boucle 1." << y << endl;
 		for (int x = 0; x < WIDTH; x++) {
 			double xFractal = (x - WIDTH / 2 - (WIDTH / 4)) * (2.0 / HEIGHT);
 			double yFractal = (y - HEIGHT / 2) * (2.0 / HEIGHT);
@@ -44,11 +47,12 @@ int main() {
 
 	int total = 0;
 	for (int i = 0; i <= Mandelbrot::MAX_ITERATIONS; i++) {
-		cout << histogram[i] << " " << flush;
+		//cout << histogram[i] << " " << flush;
 		total += histogram[i];
 	}
 
 	for (int y = 0; y < HEIGHT; y++) {
+		cout << "boucle 2." << y << endl;
 		for (int x = 0; x < WIDTH; x++) {
 
 			uint8_t red = 0;
@@ -56,23 +60,32 @@ int main() {
 			uint8_t blue = 0;
 
 			int iterations = fractal[(y * WIDTH) + x];
+	
+			uint8_t color = (uint8_t)(256 * (double)iterations / Mandelbrot::MAX_ITERATIONS);
 
 			if (iterations != Mandelbrot::MAX_ITERATIONS) {
 				double hue = 0.0;
 				for (int i = 0; i <= iterations; i++) {
-					hue += ((double)histogram[i]) / total;
+					hue += (double)histogram[i] / total;
+				}
+				if ((x * y) % 3 == 0) {
+					green = (uint8_t)pow(255, hue);
+				}
+				else if ((x * y) % 3 == 1) {
+					red = (uint8_t)pow(255, hue);
+				}
+				else if ((x * y) % 3 == 0) {
+					blue = (uint8_t)pow(255, hue);
 				}
 
-				green = pow(255, hue);
-			}
 
+			
+			}
 			bitmap.setPixel(x, y, red, green, blue);
-		}
+		}			
+		
 	}
 	
-
-
-
 	bitmap.write("test.bmp");
 	cout << "Finished" << endl;
 	return 0;
