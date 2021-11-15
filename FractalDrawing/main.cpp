@@ -5,6 +5,7 @@
 #include "Bitmap.h"
 #include "Mandelbrot.h"
 #include "ZoomList.h"
+#include "FractalCreator.h"
 
 
 
@@ -75,7 +76,7 @@ int main() {
 					hue += (double)histogram[i] / total;
 				}
 
-				green = (uint8_t)pow(255, hue);
+				green = (uint8_t)255* hue;
 
 			}
 			bitmap.setPixel(x, y, red, green, blue);
