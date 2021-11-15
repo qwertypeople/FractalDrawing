@@ -4,6 +4,17 @@
 
 namespace caveofprogramming {
 
+void FractalCreator::run(string name) {
+
+
+
+
+	calculateIteration();
+	calculateTotalIterations();
+	drawFractal();
+	writeBitmape(name);
+}
+
 
 FractalCreator::FractalCreator(int width, int height): 
 	 m_width(width)
@@ -44,12 +55,21 @@ void FractalCreator::calculateTotalIterations() {
 }
 
 void FractalCreator::drawFractal() {
+
+	uint8_t red = 0;
+	uint8_t green = 0;
+	uint8_t blue = 0;
+
+	RGB startColor(0, 0, 20);
+	RGB endColor(255, 128, 74);
+	RGB colorDiff = endColor - startColor;
+
 	for (int y = 0; y < m_height; y++) {
 		for (int x = 0; x < m_width; x++) {
 
-			uint8_t red = 0;
-			uint8_t green = 0;
-			uint8_t blue = 0;
+			red = 0;
+			green = 0;
+			blue = 0;
 
 			int iterations = m_fractal[(y * m_width) + x];
 
@@ -60,7 +80,11 @@ void FractalCreator::drawFractal() {
 				for (int i = 0; i <= iterations; i++) {
 					hue += (double)m_histogram[i] / m_total;
 				}
-				green = (uint8_t)255 * hue;
+
+				red = startColor.m_r + colorDiff.m_r * hue;
+				green = startColor.m_g + colorDiff.m_g * hue;
+				blue = startColor.m_b + colorDiff.m_b * hue;
+				
 			}
 			m_bitmap.setPixel(x, y, red, green, blue);
 		}
@@ -73,6 +97,8 @@ void FractalCreator::addZoom(const Zoom& zoom) {
 void FractalCreator::writeBitmape(string name) {
 	m_bitmap.write(name);
 }
+
+
 
 
 }

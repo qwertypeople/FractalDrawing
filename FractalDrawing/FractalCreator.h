@@ -6,6 +6,7 @@
 #include "ZoomList.h"
 #include "Mandelbrot.h"
 #include "Bitmap.h"
+#include "RGB.h"
 
 using namespace std;
 
@@ -22,15 +23,17 @@ private:
 	unique_ptr<int[]> m_fractal;
 	Bitmap m_bitmap;
 	ZoomList m_zoomList;
+		
+	void calculateIteration();
+	void calculateTotalIterations();
+	void drawFractal();	
+	void writeBitmape(string name);
+
 public:
 	FractalCreator(int width, int height);
 	virtual ~FractalCreator();
-
-	void calculateIteration();
-	void calculateTotalIterations();
-	void drawFractal();
 	void addZoom(const Zoom& zoom);
-	void writeBitmape(string name);
+	void run(string name);
 };
 
 }
